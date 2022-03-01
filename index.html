@@ -3,9 +3,9 @@
 <head>
 
 <meta charset="utf-8" />
-<title>Incrementable demo</title>
+<title>Incrementable</title>
 <link href="style.css" rel="stylesheet" />
-
+<script src="https://md-block.verou.me/md-block.js" type="module"></script>
 </head>
 <body>
 
@@ -14,6 +14,13 @@
 <textarea id="editor">background: linear-gradient(0deg, #fed 50%, #fdc 0);
 background-size: 3em;</textarea>
 <p><strong>Instructions:</strong> Place the caret on a number inside the textarea and press the up or down keyboard arrow</p>
+
+<details>
+	<summary>Docs</summary>
+
+	<md-block src="README.md"></md-block>
+</details>
+
 <script type="module">
 import Incrementable from "./incrementable.js";
 new Incrementable(editor);

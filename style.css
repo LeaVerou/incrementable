@@ -5,6 +5,10 @@
   src: local('Lobster1.4'), local('Lobster'), url('https://themes.googleusercontent.com/font?kit=TSDaXhyJuDJ-NBU0popSWA') format('truetype');
 }
 
+:root {
+	--font-mono: Consolas, Monaco, 'Andale Mono', 'Courier New', monospace;
+}
+
 html {
 	display: flex;
 	align-items: center;
@@ -22,7 +26,6 @@ body {
 	font-size: 200%;
 	max-width: 750px;
 	margin: auto;
-	text-align: center;
 }
 
 a {
@@ -33,11 +36,15 @@ h1 {
 	font-size: 280%;
 	color: #f08;
 	margin-top: 0;
+	text-align: center;
+}
+
+textarea, pre, code {
+	font-family: var(--font-mono);
 }
 
 textarea {
 	font-size: 75%;
-	font-family: Consolas, 'Andale Mono', 'Courier New', monospace;
 	width: 100%;
 	background: transparent;
 	border: 0;
@@ -48,4 +55,9 @@ textarea {
 footer {
 	display: block;
 	font-size: 60%;
+	text-align: center;
+}
+
+md-block header {
+	display: none;
 }
