@@ -1,0 +1,24 @@
+{
+  "name": "incrementable",
+  "version": "2.0.0",
+  "description": "Increment length values in textfields, like dev tools!",
+  "main": "incrementable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeaVerou/incrementable.git"
+  },
+  "keywords": [
+    "increment",
+    "decrement",
+    "css"
+  ],
+  "author": "Lea Verou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LeaVerou/incrementable/issues"
+  },
+  "homepage": "https://github.com/LeaVerou/incrementable#readme"
+}
