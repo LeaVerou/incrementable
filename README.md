@@ -15,7 +15,7 @@ Increment length values in textfields, like dev tools!
 ### Usage
 
 ```js
-import Incrementable from "./incrementable.js";
+import Incrementable from "https://incrementable.verou.me/incrementable.js";
 
 let editor = document.querySelector("textarea");
 new Incrementable(editor);
