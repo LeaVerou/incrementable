@@ -73,7 +73,7 @@ export default class Incrementable {
 				target.selectionStart = start;
 				target.selectionEnd = end;
 
-				let adjusted = Incrementable.stepValue(token, {
+				let adjusted = Incrementable.value(token, {
 					decrement: evt.key == "ArrowDown",
 					multiplier,
 					step: this.step
@@ -92,7 +92,7 @@ export default class Incrementable {
 		});
 	}
 
-	static stepValue(token, {decrement = false, multiplier = 1, step = 1} = {}) {
+	static value(token, {decrement = false, multiplier = 1, step = 1} = {}) {
 		// Extract number
 		let number = token.match(NUMBER);
 		let index = number.index;
