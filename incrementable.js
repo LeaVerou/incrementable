@@ -1,138 +1,138 @@
 /**
- * Script for making multiple numbers in a textfield incrementable/decrementable (like Firebug's CSS values)
+ * Make numbers in a textfield incrementable/decrementable (like in dev tools)
  * @author Lea Verou
- * @version 1.1
+ * @license MIT
+ * @version 2.0.0
  */
- 
-(function(){
 
-/**
- * Constructor
- * @param textField {HTMLElement} An input or textarea element
- * @param multiplier {Function} A function that accepts the event object and returns the multiplier or 0 for nothing to happen.
- */
-var _ = window.Incrementable = function(textField, multiplier, units) {
-	var me = this;
+const NUMBER = /-?(\d*\.?\d+)/;
+const PREFIX_SUFFIX = /[%\w.]/;
+const PARTIAL_TOKEN = RegExp(`^${PREFIX_SUFFIX.source}*${NUMBER.source}?${PREFIX_SUFFIX.source}*$`);
 
-	this.textField = textField;
-	
-	this.step = +textField.getAttribute('step') || 
-				+textField.getAttribute('data-step') || 1;
+export default class Incrementable {
+	constructor (target, options = {}) {
+		this.target = target;
+		this.options = Object.assign({}, options, Incrementable.defaultOptions);
 
-	this.multiplier = multiplier || function(evt) {
-		if (evt.shiftKey) { return 10; }
-		
-		if (evt.ctrlKey) { return .1; }
-		
-		return 1;
-	}
+		this.step = +target.getAttribute('step') ||
+					+target.getAttribute('data-step') || 1;
 
-	if (units) {
-		this.units = units;
-	}
-	
-	this.changed = false;
+		this.multiplier = this.options.multiplier;
+		this.prefixes = this.options.prefixes;
+		this.suffixes = this.options.units;
 
-	this.textField.addEventListener('keydown', function(evt) {
-		var multiplier = me.multiplier(evt);
-		
-		if (multiplier && (evt.keyCode == 38 || evt.keyCode == 40)) {
-			me.changed = false;
-			
-			// Up or down arrow pressed, check if there's something
-			// increment/decrement-able where the caret is
-			var caret = this.selectionStart,
-			    text = this.value,
-			    regex = new RegExp('^([\\s\\S]{0,' + caret + '}[^-0-9\\.])?(-?[0-9]*(?:\\.?[0-9]+)(?:' + me.units + '))\\b', 'i'),
-			    property = 'value' in this? 'value' : 'textContent';
-			
-			this[property] = this[property].replace(regex, function($0, $1, $2) {
-				$1 = $1 || '';
-				if ($1.length <= caret && $1.length + $2.length >= caret) {
-					
-					var stepValue = me.stepValue($2, evt.keyCode == 40, multiplier);
-					caret = caret + (stepValue.length - $2.length);
-					
-					me.changed = {
-						add: stepValue,
-						del: $2,
-						start: $1.length
-					};
+		let value = 'value' in target? 'value' : 'textContent';
 
-					return $1 + stepValue;
+		this.target.addEventListener('keydown', evt => {
+			let target = this.target;
+			let multiplier = this.multiplier(evt);
+
+			if (multiplier && (evt.key == "ArrowUp" || evt.key == "ArrowDown")) {
+				let content = target[value];
+				let caretStart = target.selectionStart;
+				let caretEnd = target.selectionEnd;
+				let selection = content.substring(caretStart, caretEnd);
+
+				if (!PARTIAL_TOKEN.test(selection)) {
+					return;
 				}
-				else {
-					return $1 + $2;
-				}
-			});
 
-			if (me.changed) {
-				this.setSelectionRange(caret, caret);
-				
-				evt.preventDefault();
-				evt.stopPropagation();
-				
-				// Fire input event
-				var evt = document.createEvent("HTMLEvents");
-				
-				evt.initEvent('input', true, true );
-				
-				evt.add = me.changed.add;
-				evt.del = me.changed.del;
-				evt.start = me.changed.start;
-				evt.incrementable = true;
-		
-				this.dispatchEvent(evt);
+				let i;
+
+				// Find potential beginning and end
+
+				for (i = caretStart - 1; i > 0; i--) {
+					let char = content[i];
+
+					if (!PREFIX_SUFFIX.test(char)) {
+						i++;
+						break;
+					}
+				}
+
+				let start = i;
+
+				for (i = caretEnd; i < content.length; i++) {
+					let char = content[i];
+
+					if (!PREFIX_SUFFIX.test(char)) {
+						break;
+					}
+				}
+
+				let end = i;
+
+				let token = content.substring(start, end);
+
+				if (!NUMBER.test(token)) {
+					// There is no number to increment here
+					return;
+				}
+
+				target.focus();
+				target.selectionStart = start;
+				target.selectionEnd = end;
+
+				let adjusted = Incrementable.stepValue(token, {
+					decrement: evt.key == "ArrowDown",
+					multiplier,
+					step: this.step
+				});
+
+				if (adjusted !== token) {
+					evt.preventDefault();
+					evt.stopPropagation();
+				}
+
+				document.execCommand("insertText", false, adjusted);
+
+				target.selectionStart = start;
+				target.selectionEnd = start + adjusted.length;
 			}
-		}
-	}, false);
+		});
+	}
 
-	this.textField.addEventListener('keypress', function(evt) {
-		if (me.changed && (evt.keyCode == 38 || evt.keyCode == 40))
-			evt.preventDefault();
-			evt.stopPropagation();
-			me.changed = false;
-	}, false);
-}
+	static stepValue(token, {decrement = false, multiplier = 1, step = 1} = {}) {
+		// Extract number
+		let number = token.match(NUMBER);
+		let index = number.index;
+		let before = token.substring(0, index);
+		let after = token.substring(index + number[0].length);
+		let val = +number[0];
+		let offset = (decrement? -1 : 1) * (multiplier || 1) * step;
+		let valPrecision = precision(val);
+		let offsetPrecision = precision(offset);
 
-_.prototype = {
-	/**
-	 * Gets a <length> and increments or decrements it
-	 */
-	stepValue: function(length, decrement, multiplier) {
-		var val = parseFloat(length),
-			offset = (decrement? -1 : 1) * (multiplier || 1) * this.step,
-			valPrecision = precision(val),
-			offsetPrecision = precision(offset);
-		
 		// Prevent rounding errors
-		var newVal = (parseFloat((val + offset).toPrecision(
+		let newVal = (parseFloat((val + offset).toPrecision(
 			Math.max(valPrecision.integer, offsetPrecision.integer) +
 			Math.max(valPrecision.decimals, offsetPrecision.decimals)
 		)));
-		
-		return newVal + length.replace(/^-|[0-9]+|\./g, '');
-	},
 
-	units: '|%|deg|px|r?em|ex|ch|in|cm|mm|pt|pc|vmin|vmax|vw|vh|gd|m?s'
-};
+		return before + newVal + after;
+	}
 
-function precision(number) {
+	static defaultOptions = {
+		multiplier: evt => evt.shiftKey? 10 : (evt.ctrlKey? .1 : 1)
+	}
+}
+
+function precision (number) {
 	number = (number + '').replace(/^0+/, '');
-	
+
 	var dot = number.indexOf('.');
-	
+
 	if (dot === -1) {
 		return {
 			integer: number.length,
 			decimals: 0
 		};
 	}
-	
+
 	return {
 		integer: dot,
 		decimals: number.length - 1 - dot
 	};
 }
 
-})();
+window.Incrementable = Incrementable;
