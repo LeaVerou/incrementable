@@ -6,7 +6,7 @@
  */
 
 const NUMBER = /-?(\d*\.?\d+)/;
-const PREFIX_SUFFIX = /[%\w.]/;
+const PREFIX_SUFFIX = /[%\w.-]/;
 const PARTIAL_TOKEN = RegExp(`^${PREFIX_SUFFIX.source}*${NUMBER.source}?${PREFIX_SUFFIX.source}*$`);
 
 export default class Incrementable {
