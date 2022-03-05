@@ -54,6 +54,18 @@ textarea {
 	box-shadow: .05em .05em .25em rgb(0 0 0 / .3) inset;
 }
 
+details md-block {
+	font: 1rem/1.5 system-ui, Helvetica Neue, sans-serif;
+	text-shadow: none;
+}
+
+details md-block pre {
+	background: white;
+	padding: .5em .7em;
+	border-radius: .3em;
+	overflow: auto;
+}
+
 footer {
 	display: block;
 	font-size: 60%;
