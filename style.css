@@ -46,6 +46,8 @@ textarea, pre, code {
 textarea {
 	font-size: 75%;
 	width: 100%;
+	height: calc(3 * 1.5em);
+	line-height: 1.5;
 	background: transparent;
 	border: 0;
 	padding: .5em .6em .4em;
