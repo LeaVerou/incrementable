@@ -70,8 +70,13 @@ export default class Incrementable {
 				}
 
 				target.focus();
-				target.selectionStart = start;
-				target.selectionEnd = end;
+
+				if (target.selectionStart != start || target.selectionEnd != end) {
+					target.selectionStart = start;
+					target.selectionEnd = end;
+
+					target.dispatchEvent(new Event("select"));
+				}
 
 				let adjusted = Incrementable.value(token, {
 					decrement: evt.key == "ArrowDown",
