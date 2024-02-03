@@ -2,7 +2,7 @@
   "name": "incrementable",
   "version": "2.0.0",
   "description": "Increment length values in textfields, like dev tools!",
-  "main": "incrementable.js",
+  "main": "incrementable.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
